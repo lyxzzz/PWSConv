@@ -43,6 +43,8 @@ Our implementation for bottleneck is:
 Our code will guarantee the identity to maintain an approximate zero mean, which may maintain a balance variance as discussed in the appendix.
 - The results of our ImageNet experiments are based on this repository. The results of our CIFAR10 and VOC experiments are based on an old TensorFlow repository, which may produce inferior results. However, all comparisons in the paper are under the same code repository. As the old TensorFlow repository is abandoned, we will continuously provide corresponding experimental results in this repository.
 
+- This repository may produce some low eval results (We have encountered this situation in one of our GPU server) during the training. Please check the eval result by running `python linear_val.py --config ${your_config_file} --ckpt ${your_ckpt_file}`.
+
 ## Installation
 
 ### Requirements
