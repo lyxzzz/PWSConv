@@ -42,18 +42,16 @@ if __name__ == "__main__":
     if args.resume is None:
         print('==> Training from scratch..')
         ckpt = None
-        best_acc = 0
         start_epoch = -1
     else:
-        print(f'==> Resuming from {args.ckptpath}..')
-        ckpt = torch.load(args.ckptpath)
-        best_acc = ckpt['acc']
+        print(f'==> Resuming from {args.resume}..')
+        ckpt = torch.load(args.resume)
         start_epoch = ckpt['epoch']
 
     model = build_model(config)
     model = model.to(device)
     # model = MMDataParallel(model.to(device), device_ids=args.gpu_ids)
-
+    
     optimizer = build_optimizer(config, model, ckpt)
 
     scheduler = build_lrscheduler(config, optimizer, start_epoch)

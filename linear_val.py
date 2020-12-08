@@ -25,7 +25,7 @@ if __name__ == "__main__":
     logger = Logger(args, config, save_file=False)
     model = build_model(config)
     print(f'==> evaluate from {args.ckpt}..')
-    load_checkpoint(model, args.ckpt, strict=True)
+    load_checkpoint(model, args.ckpt)
     model = model.to(device)
 
     evaluate_cls(model, device, test_loader, testsize, logger=logger)

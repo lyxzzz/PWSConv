@@ -10,12 +10,7 @@ pdbModel(){
     WORK_DIR=result/$2
     python -m pdb linear_train.py --config ${CONFIG_FILE} --workdir ${WORK_DIR}
 }
-testModel(){
-    CONFIG_FILE=configs/$1.py
-    CKPT=result/$2/epoch_end.pth
-    rm -rf ${WORK_DIR}
-    python linear_val.py --config ${CONFIG_FILE} --ckpt ${CKPT}
-}
-export CUDA_VISIBLE_DEVICES=0
 
-runModel resnet50_imagenet resnet50_PWS
+export CUDA_VISIBLE_DEVICES=1
+
+runModel resnet50_imagenet resnet50

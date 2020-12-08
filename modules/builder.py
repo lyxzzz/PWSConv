@@ -177,7 +177,8 @@ def build_optimizer(cfg, model, ckpt=None):
         raise ValueError(f'optimizer={opt_type} does not support.')
 
     if ckpt:
-        print('==> Resuming optimizer..')
+        print('==> Resuming...')
+        model.load_state_dict(ckpt['state_dict'])
         optimizer.load_state_dict(ckpt['optimizer'])
         # print(optimizer.state_dict())
     return optimizer

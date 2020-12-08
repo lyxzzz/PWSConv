@@ -39,8 +39,7 @@ class CIFAR10():
         self.img_norm_cfg = dict(
             mean=(0.4914, 0.4822, 0.4465),
             std=(0.2023, 0.1994, 0.2010))
-
-        
+            
         if mode == "linear":
             self.transform_train = transforms.Compose([transforms.RandomCrop(32, padding=4),
                                                 transforms.RandomHorizontalFlip(),
@@ -55,14 +54,13 @@ class CIFAR10():
             self.testset = torchvision.datasets.CIFAR10(root=test_root, train=False, download=True, transform=self.transform_test)
 
         elif mode == "selfsupervisied":
-            self.transform_train = transforms.Compose([transforms.RandomCrop(32, padding=4),
+            self.transform_train = transforms.Compose([transforms.RandomResizedCrop(32, scale=(0.2, 1.0)),
                                                 transforms.RandomHorizontalFlip(),
                                                 transforms.RandomApply(
-                                                    [transforms.ColorJitter(brightness=0.4, contrast=0.4,saturation=0.2,hue=0.1)], 
+                                                    [transforms.ColorJitter(brightness=0.4, contrast=0.4,saturation=0.4,hue=0.1)], 
                                                     p=0.8),
-                                                transforms.RandomApply(
-                                                    [transforms.Grayscale(3)],
-                                                    p=0.2),
+                                                transforms.RandomGrayscale(0.2),
+                                                # transforms.GaussianBlur(kernel_size=int(self.args.img_size * 0.1), sigma=(0.1, 2.0)),
                                                 transforms.ToTensor(),
                                                 transforms.Normalize(**self.img_norm_cfg)])
 

@@ -57,7 +57,7 @@ class ImageNet():
         self.img_norm_cfg = dict(
             mean=[0.485, 0.456, 0.406], 
             std=[0.229, 0.224, 0.225])
-        
+
         if mode == "linear":
             self.transform_train = transforms.Compose([transforms.RandomResizedCrop(224),
                                                 transforms.RandomHorizontalFlip(),
@@ -77,17 +77,17 @@ class ImageNet():
 
             # self.test_loader = torch.utils.data.DataLoader(self.testset, batch_size=batchsize, shuffle=False, num_workers=num_workers, pin_memory=True)
             
-            # self.train_loader = DataPrefetcher(torch.utils.data.DataLoader(self.trainset, batch_size=batchsize, shuffle=True, num_workers=num_workers))
+            self.train_loader = DataPrefetcher(torch.utils.data.DataLoader(self.trainset, batch_size=batchsize, shuffle=True, num_workers=num_workers))
 
-            # self.test_loader = DataPrefetcher(torch.utils.data.DataLoader(self.testset, batch_size=batchsize, shuffle=False, num_workers=num_workers))
+            self.test_loader = DataPrefetcher(torch.utils.data.DataLoader(self.testset, batch_size=batchsize, shuffle=False, num_workers=num_workers))
 
-            self.train_loader = CudaDataLoader(
-                MultiEpochsDataLoader(self.trainset, batch_size=batchsize, shuffle=True, num_workers=num_workers, pin_memory=True),
-                "cuda", queue_size=8)
+            # self.train_loader = CudaDataLoader(
+            #     MultiEpochsDataLoader(self.trainset, batch_size=batchsize, shuffle=True, num_workers=num_workers, pin_memory=True),
+            #     "cuda", queue_size=8)
             
-            self.test_loader = CudaDataLoader(
-                MultiEpochsDataLoader(self.testset, batch_size=batchsize, shuffle=False, num_workers=num_workers, pin_memory=True),
-                "cuda", queue_size=8)
+            # self.test_loader = CudaDataLoader(
+            #     MultiEpochsDataLoader(self.testset, batch_size=batchsize, shuffle=False, num_workers=num_workers, pin_memory=True),
+            #     "cuda", queue_size=8)
 
     def get_loader(self):
         return self.train_loader, self.test_loader
