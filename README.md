@@ -79,6 +79,7 @@ The above command will use **configs/resnet50_imagenet.py** as the configuration
 | :----- | :----- | :----: | :----: | :----: | :----: |
 | ResNet-50 | BN | 4.2 | 14.9 | 23.508 | 76.4 |
 | ResNet-50 | PWS | 4.6 | 14.9 | 23.508 | 76.0 |
+| ResNet-50 | GN | 3.9 | 13.4 | 23.508 | 75.7 |
 
 Speed represents the number of iterations (or steps) that can be trained (inference) on an RTX2080ti per second.
 
