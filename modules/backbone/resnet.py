@@ -39,13 +39,14 @@ class BasicBlock(nn.Module):
                                         norm_cfg=norm_cfg)
 
         if "initalpha" in conv_cfg:
-                conv_cfg["initalpha"] = False
+            initalpha = conv_cfg["initalpha"]
+            conv_cfg["initalpha"] = False
 
         self.conv2, self.norm2 = build_conv_layer(conv_cfg, self.mid_channels, out_channels,
                                         kernel_size=3, stride=1, padding=1, 
                                         norm_cfg=norm_cfg)
-        if "initalpha" in conv_cfg:
-                conv_cfg["initalpha"] = True
+        if "initalpha" in conv_cfg and initalpha:
+            conv_cfg["initalpha"] = True
 
         self.relu = nn.ReLU(inplace=False)
         self.downsample = downsample
@@ -114,6 +115,7 @@ class Bottleneck(nn.Module):
                                         norm_cfg=norm_cfg)
         
         if "initalpha" in conv_cfg:
+            initalpha = conv_cfg["initalpha"]
             conv_cfg["initalpha"] = False
 
         self.conv2, self.norm2 = build_conv_layer(conv_cfg, self.mid_channels, self.mid_channels,
@@ -124,7 +126,7 @@ class Bottleneck(nn.Module):
                                         kernel_size=1, stride=1, padding=0,
                                         norm_cfg=norm_cfg)
         
-        if "initalpha" in conv_cfg:
+        if "initalpha" in conv_cfg and initalpha:
             conv_cfg["initalpha"] = True
 
         self.relu = nn.ReLU(inplace=False)

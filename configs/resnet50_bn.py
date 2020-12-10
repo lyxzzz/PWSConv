@@ -2,9 +2,9 @@ num_class = 1000
 
 dataset = dict(
     type='ImageNet',
-    train_root='/home/liuyuxiang/dataset/imagenet/train',
+    train_root='/home/t/dataset/imagenet/train',
     train_list='imagenet_label/train_labeled.txt',
-    test_root='/home/liuyuxiang/dataset/imagenet/val',
+    test_root='/home/t/dataset/imagenet/val',
     test_list='imagenet_label/val_labeled.txt',
     batchsize=64,
     num_workers=16,

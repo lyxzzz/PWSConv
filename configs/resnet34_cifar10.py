@@ -2,8 +2,8 @@ num_class = 10
 
 dataset = dict(
     type='CIFAR10',
-    train_root='/home/liuyuxiang/dataset/cifar10',
-    test_root='/home/liuyuxiang/dataset/cifar10',
+    train_root='/home/t/dataset/cifar10',
+    test_root='/home/t/dataset/cifar10',
     num_workers=16,
     batchsize=128,
     num_class=num_class)

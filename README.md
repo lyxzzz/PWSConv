@@ -75,13 +75,15 @@ The above command will use **configs/resnet50_imagenet.py** as the configuration
 ## Experimental results
 
 ### ImageNet
-| Backbone | Methods | Training speed(FPS) | Inference speed(FPS) | Params(M) | Top-1(%) |
+| Backbone | Methods | Training speed(task/sec) | Inference speed(task/sec) | Params(M) | Top-1(%) |
 | :----- | :----- | :----: | :----: | :----: | :----: |
-| ResNet-50 | BN | - | - | - | 76.4 |
-| ResNet-50 | PWS | - | - | - | 76.0 |
+| ResNet-50 | BN | 4.2 | 14.9 | 23.508 | 76.4 |
+| ResNet-50 | PWS | 4.6 | 14.9 | 23.508 | 76.0 |
+
+Speed represents the number of iterations (or steps) that can be trained (inference) on an RTX2080ti per second.
 
 ### Cifar10
-| Backbone | Methods | Training speed(FPS) | Inference speed(FPS) | Params(M) | Top-1(%) |
-| :----- | :----- | :----: | :----: | :----: | :----: |
-| ResNet-34 | BN | - | - | - | 95.3 |
-| ResNet-34 | PWS | - | - | - | 94.8 |
+| Backbone | Methods | Top-1(%) |
+| :----- | :----- | :----: |
+| ResNet-34 | BN | 95.3 |
+| ResNet-34 | PWS | 94.8 |
