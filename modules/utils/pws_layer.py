@@ -59,12 +59,12 @@ class PWSConv(nn.Module):
         ex = self.weight.mean(axis=self.mode_shape, keepdim=True)
         var = self.weight.var(axis=self.mode_shape, keepdim=True) + self.gamma
 
-        weight = self.alpha * (self.weight - ex) / var.sqrt()
+        weight = self.constval * self.alpha * (self.weight - ex) / var.sqrt()
         return weight
 
     def __normal_forward(self, x):
         if self.training:
-            kernel = self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
+            kernel = self.constval * self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
         else:
             kernel = self.kernel
         output = F.conv2d(x, kernel, bias=self.bias, padding=self.padding, stride=self.stride)
@@ -77,13 +77,13 @@ class PWSConv(nn.Module):
         assert self.training
         self._forwardfunc = self.__normal_forward
         
-        kernel = self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
+        kernel = self.constval * self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
         output = F.conv2d(x, kernel, bias=self.bias, padding=self.padding, stride=self.stride)
 
         outputvar = output.var()
         nn.init.constant_(self.alpha, torch.sqrt(2 / outputvar))
 
-        kernel = self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
+        kernel = self.constval * self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
         output = F.conv2d(x, kernel, bias=self.bias, padding=self.padding, stride=self.stride)
 
         if self.activation is not None:
@@ -93,7 +93,7 @@ class PWSConv(nn.Module):
     def train(self, mode=True):
         super(PWSConv, self).train(mode)
         if not mode:
-            self.kernel = self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
+            self.kernel = self.constval * self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
 
     def forward(self, x):
         return self._forwardfunc(x)
