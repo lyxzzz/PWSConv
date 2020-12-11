@@ -77,9 +77,9 @@ class ImageNet():
 
             # self.test_loader = torch.utils.data.DataLoader(self.testset, batch_size=batchsize, shuffle=False, num_workers=num_workers, pin_memory=True)
             
-            self.train_loader = DataPrefetcher(torch.utils.data.DataLoader(self.trainset, batch_size=batchsize, shuffle=True, num_workers=num_workers))
+            self.train_loader = DataPrefetcher(torch.utils.data.DataLoader(self.trainset, batch_size=batchsize, shuffle=True, num_workers=num_workers, pin_memory=True))
 
-            self.test_loader = DataPrefetcher(torch.utils.data.DataLoader(self.testset, batch_size=batchsize, shuffle=False, num_workers=num_workers))
+            self.test_loader = DataPrefetcher(torch.utils.data.DataLoader(self.testset, batch_size=batchsize, shuffle=False, num_workers=num_workers, pin_memory=True))
 
             # self.train_loader = CudaDataLoader(
             #     MultiEpochsDataLoader(self.trainset, batch_size=batchsize, shuffle=True, num_workers=num_workers, pin_memory=True),
