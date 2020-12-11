@@ -95,6 +95,10 @@ class PWSConv(nn.Module):
         if not mode:
             self.kernel = self.constval * self.alpha * F.layer_norm(self.weight, self.norm_shape, weight=None, bias=None, eps=self.gamma)
 
+            if self._forwardfunc == self.__first_forward:
+                logging.warning("Evaluating before training when using initalpha mode may disable initalpha.")
+                self._forwardfunc = self.__normal_forward
+
     def forward(self, x):
         return self._forwardfunc(x)
 
