@@ -21,7 +21,7 @@ neck_norm_cfg = None
 zero_init_residual = True
 if use_pws:
     norm_cfg = dict(type='GN', num_groups=1, requires_grad=True)
-    conv_cfg = dict(type='pws', gamma=1e-3, equiv=False, initalpha=True, mode="fan_in")
+    conv_cfg = dict(type='pws', gamma=1e-3, equiv=False, initalpha=False, mode="fan_out")
     neck_norm_cfg = dict(type='GN', num_groups=1, requires_grad=True)
     zero_init_residual = False
 
