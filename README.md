@@ -45,6 +45,13 @@ Our code will guarantee the identity to maintain an approximate zero mean, which
 
 - This repository may produce some low eval results (We have encountered this situation in one of our GPU server) during the training. Please check the eval result by running `python linear_val.py --config ${your_config_file} --ckpt ${your_ckpt_file}`.
 
+- Some class-wise results are presented in [results](results). Every row indicates {class id}, {top-1 acc}. The first row is the total top-1 acc.
+
+| Methods | Top-1(%) | File |
+| :----- | :----- | :----: |
+| PWS | 76.0 | [imagenet.txt](results/imagenet.txt) |
+
+
 ## Installation
 
 ### Requirements
