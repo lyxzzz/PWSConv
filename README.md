@@ -93,5 +93,6 @@ Speed represents the number of iterations (or steps) that can be trained (infere
 ### Cifar10
 | Backbone | Methods | Top-1(%) |
 | :----- | :----- | :----: |
+| ResNet-34 | GN | 94.2 |
 | ResNet-34 | BN | 95.3 |
 | ResNet-34 | PWS | 95.1 |

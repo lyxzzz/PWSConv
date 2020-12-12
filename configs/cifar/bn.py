@@ -14,7 +14,7 @@ total_epochs = 200
 
 pretrained = None
 
-use_pws = True
+use_pws = False
 norm_cfg = dict(type='BN', requires_grad=True)
 conv_cfg = dict(type='conv')
 neck_norm_cfg = None
