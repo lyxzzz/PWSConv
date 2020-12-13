@@ -47,6 +47,8 @@ if __name__ == "__main__":
         print(f'==> Resuming from {args.resume}..')
         ckpt = torch.load(args.resume)
         start_epoch = ckpt['epoch']
+        if "initalpha" in config['backbone']['conv_cfg']:
+            config['backbone']['conv_cfg']['initalpha'] = False
 
     model = build_model(config)
     model = model.to(device)
