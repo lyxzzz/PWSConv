@@ -69,6 +69,23 @@ pip install mmcv==0.6.0
 Notice that you should install a compatible version of PyTorch with your Cuda version (here we use **cudatoolkit=10.1**). Please refer to [pytorch](https://pytorch.org/get-started/locally/) to find a detailed installation for PyTorch.
 
 ## Getting Started
+Before running a scipt, you would better run 
+```
+ln -s ${DATASET_ROOT} dataset
+```
+to configure your data path. If your folder structure is different, you may need to change the corresponding paths in config files.
+```
+PWSConv
+├── configs
+├── imagenet_label
+├── modules
+├── dataset
+│   ├── imagenet
+│   │   ├── train
+│   │   ├── val
+│   ├── cifar
+│   │   ├── cifar-10-batches-py
+```
 We provide a [scipt](train.sh) and some [configs](configs) to train models. In [train.sh](train.sh), one can run:
 ``` bash
 runModel ${configfile} ${logname}

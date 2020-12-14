@@ -1,27 +1,35 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+import numpy as np
 
 def _knn(similarity, target, topk=1):
-    correct = (target.expand_as(similarity) == target.expand_as(similarity).t())
-    _, pred_label = similarity.topk(topk, dim=1)
-    result = 0
-    for i in range(pred_label.size(0)):
-        correct_i = correct[i][pred_label[i]].sum() / float(topk)
-        result += correct_i.item()
+    datasize = similarity.shape[0]
+
+    correct = (target == target.transpose())
+
+    assert correct.shape == similarity.shape
+    select_index = np.arange(datasize).reshape(datasize, -1)
+
+    correct[select_index, select_index] = False
+
+    sim_index = np.argpartition(similarity, -topk, axis=1)[:, -topk:]
+
+    result = correct[select_index, sim_index].sum() / float(topk) / datasize
 
     return result
 
 
-def KNN(pred:torch.Tensor, target, topk=500, l2norm=True):
-    with torch.no_grad():
-        if len(pred.size()) != 2:
-            pred = pred.mean(axis=[2, 3])
-        assert len(pred.size()) == 2
-        assert len(target.size()) == 1
+def KNN(pred, target, topk=500, l2norm=True):
+    assert len(pred.shape) == 2
+    assert len(target.shape) == 2
 
-        if l2norm:
-            pred = F.normalize(pred, dim=1)
+    if l2norm:
+        pred = pred / np.linalg.norm(pred, axis=1, keepdims=True)
 
-        out = torch.matmul(pred, pred.t())
-        return _knn(out, target, topk)
+    out = np.matmul(pred, pred.transpose())
+
+    return _knn(out, target, topk)
+
+if __name__ == "__main__":
+    a = np.random.rand(16, 512)
+    b = np.random.randint(0, 16, size=(16, 1))
+    print(b)
+    print(KNN(a, b, topk=10))

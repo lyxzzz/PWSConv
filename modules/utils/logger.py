@@ -63,13 +63,14 @@ class Logger():
 
     def record_train(self, loginfo, outputs):
         if self.train_outputs is None:
-            self.train_outputs = outputs.copy()
-            for entry in self.train_outputs:
-                if isinstance(self.train_outputs[entry], dict):
-                    for k in self.train_outputs[entry]:
-                        self.train_outputs[entry][k] = self.train_outputs[entry][k].item()
+            self.train_outputs = {}
+            for entry, value in outputs.items():
+                if isinstance(value, dict):
+                    self.train_outputs[entry] = {}
+                    for k, v in value.items():
+                        self.train_outputs[entry][k] = v.item()
                 else:
-                    self.train_outputs[entry] = self.train_outputs[entry].item()
+                    self.train_outputs[entry] = value.item()
 
             self.train_outputs['sample_num'] = loginfo['batchsize']
             self.train_outputs['time'] = loginfo['time']
@@ -110,15 +111,6 @@ class Logger():
                 else:
                     loginfo[k1] = round(v1 / float(self.interval), 4)
                     msg = "{}, {}: {:.4f}".format(msg, k1, loginfo[k1])
-            # if 'loss' in self.train_outputs:
-            #     loginfo['loss'] = round(self.train_outputs['loss'] / float(self.interval), 4)
-            #     msg = "{}, loss: {:.4f}".format(msg, loginfo['loss'])
-            
-            
-            # if 'accuracy' in self.train_outputs:
-            #     for k in self.train_outputs['accuracy']:
-            #         loginfo[k] = round(self.train_outputs['accuracy'][k] * (100.0 / self.train_outputs['sample_num']), 4)
-            #         msg = "{}, {}: {:.4f}".format(msg, k, loginfo[k])
             
             self.train_outputs = None
             

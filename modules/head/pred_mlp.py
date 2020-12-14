@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import math
 from mmcv.cnn import (normal_init, constant_init, kaiming_init)
 
 def D(p, z, version='simplified'): # negative cosine similarity
@@ -25,14 +26,26 @@ class Pred_MLP(nn.Module):
             nn.Linear(hidden_channels, out_channels)
         )
 
-    def init_weights(self, init_linear='normal', std=0.01, bias=0.):
-        assert init_linear in ['normal', 'kaiming']
+    # def init_weights(self, init_linear='normal', std=0.01, bias=0.):
+    #     assert init_linear in ['normal', 'kaiming']
+    #     for m in self.modules():
+    #         if isinstance(m, nn.Linear):
+    #             if init_linear == 'normal':
+    #                 normal_init(m, std=std, bias=bias)
+    #             else:
+    #                 kaiming_init(m, mode='fan_in', nonlinearity='relu')
+    #         elif isinstance(m, (nn.LayerNorm, nn.BatchNorm1d, nn.BatchNorm2d,
+    #                             nn.GroupNorm, nn.SyncBatchNorm)):
+    #             if m.weight is not None:
+    #                 nn.init.constant_(m.weight, 1)
+    #             if m.bias is not None:
+    #                 nn.init.constant_(m.bias, 0)
+
+    def init_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Linear):
-                if init_linear == 'normal':
-                    normal_init(m, std=std, bias=bias)
-                else:
-                    kaiming_init(m, mode='fan_in', nonlinearity='relu')
+                m.reset_parameters()
+
             elif isinstance(m, (nn.LayerNorm, nn.BatchNorm1d, nn.BatchNorm2d,
                                 nn.GroupNorm, nn.SyncBatchNorm)):
                 if m.weight is not None:

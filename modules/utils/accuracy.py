@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch
 
 def accuracy(pred, target, topk=1):
     assert isinstance(topk, (int, tuple))
@@ -21,7 +22,6 @@ def accuracy(pred, target, topk=1):
         # res.append(correct_k.mul_(100.0 / pred.size(0)))
         res.append(correct_k)
     return res[0] if return_single else res
-
 
 class Accuracy(nn.Module):
 

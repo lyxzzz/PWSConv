@@ -8,7 +8,7 @@ from mmcv.runner import load_checkpoint
 
 class ReluNeck(nn.Module):
 
-    def __init__(self, in_channels, frozen_state=False, norm_cfg=None):
+    def __init__(self, in_channels, frozen_state=False, norm_cfg=None, avgpool=False):
         super(ReluNeck, self).__init__()
         self.norm_cfg = norm_cfg
         self.frozen_state = frozen_state
@@ -18,6 +18,11 @@ class ReluNeck(nn.Module):
             self.norm = None
 
         self.relu = nn.ReLU(inplace=False)
+        if avgpool:
+            self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        else:
+            self.avgpool = None
+            
         self._freeze_stages()
 
     def _freeze_stages(self):
@@ -39,17 +44,11 @@ class ReluNeck(nn.Module):
         self._freeze_stages()
 
     def forward(self, x):
-        if isinstance(x, torch.Tensor):
-            if self.norm:
-                x = self.norm(x)
-            
-            outs = self.relu(x)
-            return outs
-        else:
-            outs = []
-            for item in x:
-                if self.norm:
-                    item = self.norm(item)
-                outs.append(self.relu(item))
-                return outs
+        if self.norm:
+            x = self.norm(x)
+        
+        outs = self.relu(x)
+        if self.avgpool is not None:
+            outs = self.avgpool(outs).view(outs.size(0), -1)
+        return outs
 

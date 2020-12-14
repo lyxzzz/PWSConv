@@ -1,70 +1,96 @@
 import torch
 import torch.nn as nn
+import numpy as np
 import time
 import mmcv
 from ..utils import KNN
 
-def evaluate_cls(model, device, data_loader, datasize, epoch=0, logger=None):
-    model.eval()
-    correct = None
-    total = 0
-    prog_bar = mmcv.ProgressBar(datasize)
+class evaluate_cls(object):
+    def __init__(self, model, device, data_loader, datasize, logger=None):
+        self.model = model
+        self.device = device
+        self.data_loader = data_loader
+        self.datasize = datasize
+        self.logger = logger
 
-    with torch.no_grad():
-        for batch_idx, (inputs, targets) in enumerate(data_loader):
-            inputs, targets = inputs.to(device), targets.to(device)
+    def __call__(self, epoch=0):
+        self.model.eval()
 
-            outputs = model(inputs, targets)
+        correct = None
+        total = 0
+        prog_bar = mmcv.ProgressBar(self.datasize)
 
-            total += targets.size(0)
-            if correct is None:
-                correct = {}
-                for k in outputs['accuracy']:
-                    correct[k] = outputs['accuracy'][k].item()
+        with torch.no_grad():
+            for batch_idx, (inputs, targets) in enumerate(self.data_loader):
+                inputs, targets = inputs.to(self.device), targets.to(self.device)
+
+                outputs = self.model(inputs, targets)
+
+                total += targets.size(0)
+                if correct is None:
+                    correct = {}
+                    for k in outputs['accuracy']:
+                        correct[k] = outputs['accuracy'][k].item()
+                else:
+                    for k in outputs['accuracy']:
+                        correct[k] += outputs['accuracy'][k].item()
+
+                for _ in range(targets.size(0)):
+                    prog_bar.update()
+
+        for k in correct:
+            correct[k] = round(correct[k] / float(total) * 100.0, 4)
+        
+        self.logger.record_eval(epoch, correct)
+
+class evaluate_knn(object):
+    def __init__(self, model, device, data_loader, datasize, config, logger):
+        self.model = model
+        self.device = device
+        self.data_loader = data_loader
+        self.datasize = datasize
+        self.config = config
+        self.logger = logger
+        self.outputs_container = None
+        self.targets_container = np.zeros([1, datasize], dtype=np.int64)
+        
+        self.knn_config = config.get('knn', {})
+        if "topk" not in self.knn_config:
+            if "topk_percent" not in self.knn_config:
+                self.topk = int(datasize / config['num_class'] * 0.2)
             else:
-                for k in outputs['accuracy']:
-                    correct[k] += outputs['accuracy'][k].item()
-
-            for _ in range(targets.size(0)):
-                prog_bar.update()
-
-    for k in correct:
-        correct[k] = round(correct[k] / float(total) * 100.0, 4)
+                self.topk = int(datasize / config['num_class'] * self.knn_config.pop('topk_percent'))
+            self.knn_config['topk'] = topk
+        else:
+            self.topk = self.knn_config['topk']
     
-    logger.record_eval(epoch, correct)
+    def __call__(self, epoch=0):
+        self.model.eval()
 
-def evaluate_knn(model, device, data_loader, datasize, config, epoch=0, logger=None):
-    model.eval()
-    total = 0
+        prog_bar = mmcv.ProgressBar(self.datasize)
 
-    knn_config = config.get('knn', {})
-    if "topk_percent" not in knn_config:
-        topk = int(datasize / config['num_class'] * 0.2)
-    else:
-        topk = int(datasize / config['num_class'] * knn_config.pop('topk_percent'))
-    knn_config['topk'] = topk
+        sample_idx = 0
+        with torch.no_grad():
+            for batch_idx, (inputs, targets) in enumerate(self.data_loader):
+                inputs, targets = inputs.to(self.device), targets.to(self.device)
+                
+                batchsize = targets.size(0)
 
-    prog_bar = mmcv.ProgressBar(datasize)
+                outputs = self.model.forward_knn(inputs)
+                    
+                if self.outputs_container is None:
+                    self.outputs_container = np.zeros([self.datasize, outputs.size(1)], dtype=np.float32)
+                
+                self.outputs_container[sample_idx:sample_idx+batchsize] = outputs.cpu().numpy()
+                self.targets_container[0, sample_idx:sample_idx+batchsize] = targets.cpu().numpy()
 
-    total_outputs = []
-    total_targets = []
+                sample_idx += batchsize
+                for _ in range(batchsize):
+                    prog_bar.update()
 
-    with torch.no_grad():
-        for batch_idx, (inputs, targets) in enumerate(data_loader):
-            inputs, targets = inputs.to(device), targets.to(device)
-
-            outputs = model.forward_knn(inputs)
-            total_outputs.append(outputs)
-            total_targets.append(targets)
-
-            for _ in range(targets.size(0)):
-                prog_bar.update()
-
-    print('==> Calculating KNN..')
-    total_outputs = torch.cat(total_outputs, dim=0)
-    total_targets = torch.cat(total_targets, dim=0)
-    total_acc = KNN(total_outputs, total_targets, **knn_config) / datasize
-    correct = {
-        f"KNN-{topk}":total_acc * 100.0
-    }
-    logger.record_eval(epoch, correct)
+        print('==> Calculating KNN..')
+        total_acc = KNN(self.outputs_container, self.targets_container, **self.knn_config)
+        correct = {
+            f"KNN-{self.topk}":total_acc * 100.0
+        }
+        self.logger.record_eval(epoch, correct)

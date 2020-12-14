@@ -59,11 +59,12 @@ class SSModel(nn.Module):
         self.head = head
 
         self.backbone.init_weights()
-        self.neck.init_weights()
+        if self.neck is not None:
+            self.neck.init_weights()
         self.head.init_weights()
         
-
         self.relu = nn.ReLU(inplace=True)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         
         if pretrained is not None:
             load_checkpoint(self, pretrained)
@@ -72,11 +73,8 @@ class SSModel(nn.Module):
         self.logger.info("{}".format(self))
     
     def forward(self, x1, x2):
-        z1 = self.backbone(x1)
-        z1 = self.relu(z1)
-
-        z2 = self.backbone(x2)
-        z2 = self.relu(z2)
+        z1 = self.forward_knn(x1)
+        z2 = self.forward_knn(x2)
         
         if self.neck is not None:
             z1 = self.neck(z1)
@@ -88,9 +86,11 @@ class SSModel(nn.Module):
     def forward_knn(self, x):
         out = self.backbone(x)
         out = self.relu(out)
-        if self.neck is not None:
-            out = self.neck(out)
-            out = self.relu(out)
+        out = self.avgpool(out)
+        out = out.view(out.size(0), -1)
+        # if self.neck is not None:
+        #     out = self.neck(out)
+        #     out = self.relu(out)
 
         return out
 

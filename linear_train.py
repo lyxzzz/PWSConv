@@ -37,6 +37,8 @@ if __name__ == "__main__":
 
     logger = Logger(args, config)
     logger.print(f"{config.text}")
+    logger.print(f"{dataset.transform_train}")
+    logger.print(f"{dataset.transform_test}")
     saver = Saver(config, logger)
 
     if args.resume is None:
@@ -59,6 +61,8 @@ if __name__ == "__main__":
     scheduler = build_lrscheduler(config, optimizer, start_epoch)
     total_epoch = config["total_epochs"]
 
+    evaluate = evaluate_cls(model, device, test_loader, testsize, logger)
+
     for epoch in range(start_epoch + 1, total_epoch):
         epoch_train(model, epoch, device, train_loader, optimizer, scheduler, logger, saver)
-        evaluate_cls(model, device, test_loader, testsize, epoch, logger)
+        evaluate(epoch)

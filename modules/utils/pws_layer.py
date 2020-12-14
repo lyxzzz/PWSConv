@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from torch import nn
 from torch.nn.parameter import Parameter
 import math
+import logging
 
 def pws_init(module: nn.Module) -> None:
     nn.init.kaiming_normal_(module.weight, mode=module.mode, nonlinearity="relu")
